@@ -123,12 +123,17 @@ function App() {
           });
         } else {
           // User is signed out --> sign in
-          GoogleAuth.signIn().then((res) => {
-            console.log("User signed in", res);
-            setSignedIn(GoogleAuth.isSignedIn.get());
-            setUserData(GoogleAuth.currentUser.get().getBasicProfile());
-            setLoadingGoogleAuth(false);
-          });
+          GoogleAuth.signIn()
+            .then((res) => {
+              console.log("User signed in", res);
+              setSignedIn(GoogleAuth.isSignedIn.get());
+              setUserData(GoogleAuth.currentUser.get().getBasicProfile());
+              setLoadingGoogleAuth(false);
+            })
+            .catch((error) => {
+              console.log(error);
+              setLoadingGoogleAuth(false);
+            });
         }
       } else {
         console.error("Google Auth is not defined!");
