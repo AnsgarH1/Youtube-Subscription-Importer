@@ -313,6 +313,18 @@ function App() {
               </Alert>
             )}
           </Box>
+          <Box>
+            <Text>
+              you can find more Information about this project{" "}
+              <Link
+                color="red.400"
+                isExternal
+                href="https://github.com/AnsgarH1/Youtube-Subscription-Importer"
+              >
+                here <Icon name="external-link" mx="2px" />
+              </Link>
+            </Text>
+          </Box>
         </Box>
       </Box>
     </ThemeProvider>
