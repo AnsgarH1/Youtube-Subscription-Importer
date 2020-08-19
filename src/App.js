@@ -24,8 +24,21 @@ const googleClientID =
 const googleApiKey = "AIzaSyCNsY71HB1tD-UegkZ-Q6dE1pkmPwVikF4";
 
 function App() {
-  // Solution for Text-File Parsing, copied from https://dev.to/ilonacodes/frontend-shorts-how-to-read-content-from-the-file-input-in-react-1kfb
+  //variables for more User-Friendly UI
+  const [signedIn, setSignedIn] = useState(false);
+  const [userData, setUserData] = useState(null);
+  const [loadingGoogleAuth, setLoadingGoogleAuth] = useState(true);
+  const [responseErrorMessage, setResponseErrorMessage] = useState(null);
+
+  /**
+   *  XML File Handling
+   *
+   * moslty copied from https://dev.to/ilonacodes/frontend-shorts-how-to-read-content-from-the-file-input-in-react-1kfb
+   */
+
+  //Array with Youtube Channel List
   const [channelsToSubscribe, setChannels] = useState([]);
+
   let fileReader;
   const handleFileRead = (e) => {
     const rawXML = fileReader.result;
@@ -38,12 +51,15 @@ function App() {
     fileReader.readAsText(file);
   };
 
-  // 
-  const [signedIn, setSignedIn] = useState(false);
-  const [userData, setUserData] = useState(null);
-  const [loadingGoogleAuth, setLoadingGoogleAuth] = useState(true);
+  /**
+   *  Google API Stuff ----------
+   */
 
-  //loading Google API (gapi)
+  /**
+   *  Authentication
+   *
+   *  (is stored in State)
+   */
   const [GoogleAuth, setGoogleAuth] = useState(null);
   const start = () => {
     // 2. Initialize the JavaScript client library.
@@ -53,6 +69,9 @@ function App() {
         apiKey: googleApiKey,
         clientId: googleClientID,
         scope: "https://www.googleapis.com/auth/youtube",
+        discoveryDocs: [
+          "https://www.googleapis.com/discovery/v1/apis/youtube/v3/rest",
+        ],
       })
       .then(function () {
         setGoogleAuth(window.gapi.auth2.getAuthInstance());
@@ -75,6 +94,7 @@ function App() {
     htmlScript.onload = () => {
       console.log("Loaded Google API!");
       window.gapi.load("client", start);
+      window.gapi.load("youtube", "v3");
     };
   }, []);
 
@@ -108,7 +128,51 @@ function App() {
       setLoadingGoogleAuth(false);
     }
   };
+  /**
+   *
+   * Handling Youtube Subscriptions
+   *
+   */
 
+  const subscribeToAllChannels = () => {
+    try {
+      if (GoogleAuth) {
+        if (channelsToSubscribe.length > 0) {
+          channelsToSubscribe.forEach((channel, index) => {
+            const requestBody = {
+              part: "id,snippet",
+              snippet: {
+                resourceId: {
+                  kind: "youtube#channel",
+                  channelId: channel.channelID,
+                },
+              },
+            };
+            window.gapi.client.youtube.subscriptions
+              .insert(requestBody)
+              .then((response) => {
+                console.log(
+                  "Response",
+                  response.status,  
+                );
+              })
+              .catch((response) => JSON.parse(response.body))
+              .then((res) => setResponseErrorMessage(res.error.message));
+          });
+        } else {
+          alert("You need to import Subs first!");
+        }
+      } else {
+        alert("You need to Authenticate First!");
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  /**
+   *  React-UI-Code, Components are from Chakra-UI
+   */
   return (
     <ThemeProvider>
       <CSSReset />
@@ -215,9 +279,31 @@ function App() {
             <Heading as="h3" size="md">
               4. Subscripte via API
             </Heading>
-            <Button my="4" bg="red.600" color="white" onClick={() => {}}>
+            <Button
+              my="4"
+              bg="red.600"
+              color="white"
+              onClick={() => {
+                setResponseErrorMessage(null);
+                subscribeToAllChannels();
+              }}
+            >
               Subscribe to {channelsToSubscribe.length} Channels!
             </Button>
+            {responseErrorMessage && (
+              <Alert status="error" my="2">
+                <AlertIcon />
+                {responseErrorMessage}
+              </Alert>
+            )}
+            {responseErrorMessage ===
+              'The request cannot be completed because you have exceeded your <a href="/youtube/v3/getting-started#quota">quota</a>.' && (
+              <Alert status="info" my="2">
+                <AlertIcon />
+                Please try again tomorrow. Googles API only allows a limited
+                amount of requests per day.
+              </Alert>
+            )}
           </Box>
         </Box>
       </Box>
@@ -226,68 +312,3 @@ function App() {
 }
 
 export default App;
-
-/**
- * 
- *  // Google Authentication
-
-  // Check if already Authenticated on Start
-  useEffect(() => {
-    let auth = async () =>
-      Promise.resolve(
-        loadAuth2(
-          "364375717000-ojqq73j0qrou6k0lomakl5bdplalptai.apps.googleusercontent.com",
-          "https://www.googleapis.com/auth/youtube.force-ssl"
-        )
-      );
-
-    auth()
-      .then((res) => {
-        console.log(res);
-        if (res.isSignedIn.get()) {
-          setGAuth(res.currentUser.get().rt.Ad);
-        } else {
-          setGAuth(null);
-        }
-      })
-      .then(() => loadClient());
-  }, []);
-
-  //Open Google Sign In Dialog
-  const signIn = async () => {
-    let auth2 = await loadAuth2(
-      "364375717000-ojqq73j0qrou6k0lomakl5bdplalptai.apps.googleusercontent.com",
-      "https://www.googleapis.com/auth/youtube.force-ssl"
-    );
-    auth2.signIn().then((response) => {
-      console.log(response);
-      setGAuth(response.rt.Ad);
-    });
-    setGAuth(gAuth);
-  };
-
-  //Sign out
-  const signOut = async () => {
-    let auth2 = gapi.auth2.getAuthInstance();
-    auth2.signOut().then(() => {
-      setGAuth(null);
-      console.log("User signed out.");
-    });
-  };
-
-  //loading Youtube Client API
-  const loadClient = async () => {
-    console.log(gapi);
-    gapi.client.setApiKey("AIzaSyCNsY71HB1tD-UegkZ-Q6dE1pkmPwVikF4");
-    return await gapi
-      .load("https://www.googleapis.com/discovery/v1/apis/youtube/v3/rest")
-      .then(
-        function () {
-          console.log("GAPI client loaded for API");
-        },
-        function (err) {
-          console.error("Error loading GAPI client for API", err);
-        }
-      );
-  };
- */
