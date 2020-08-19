@@ -1,5 +1,3 @@
-//Client-ID 364375717000-ojqq73j0qrou6k0lomakl5bdplalptai.apps.googleusercontent.com
-// API-Key AIzaSyCNsY71HB1tD-UegkZ-Q6dE1pkmPwVikF4
 import React, { useState, useEffect } from "react";
 
 import {
@@ -20,7 +18,7 @@ import {
 import { xml2subs } from "./methods/xml2subs";
 
 const googleClientID =
-  "364375717000-ojqq73j0qrou6k0lomakl5bdplalptai.apps.googleusercontent.com";
+  "364375717000-m3dkm19ddi6blamm1bne7o0un0s54c3t.apps.googleusercontent.com";
 const googleApiKey = "AIzaSyCNsY71HB1tD-UegkZ-Q6dE1pkmPwVikF4";
 
 function App() {
@@ -63,26 +61,39 @@ function App() {
   const [GoogleAuth, setGoogleAuth] = useState(null);
   const start = () => {
     // 2. Initialize the JavaScript client library.
-    console.log("initializing gapi client");
-    window.gapi.client
-      .init({
-        apiKey: googleApiKey,
-        clientId: googleClientID,
-        scope: "https://www.googleapis.com/auth/youtube",
-        discoveryDocs: [
-          "https://www.googleapis.com/discovery/v1/apis/youtube/v3/rest",
-        ],
-      })
-      .then(function () {
-        setGoogleAuth(window.gapi.auth2.getAuthInstance());
-      });
+    try {
+      console.log("initializing gapi client");
+      window.gapi.client
+        .init({
+          apiKey: googleApiKey,
+          clientId: googleClientID,
+          scope: "https://www.googleapis.com/auth/youtube",
+          discoveryDocs: [
+            "https://www.googleapis.com/discovery/v1/apis/youtube/v3/rest",
+          ],
+        })
+        .then(function () {
+          setGoogleAuth(window.gapi.auth2.getAuthInstance());
+        })
+        .catch((error) => {
+          console.error("Google API Client init Error:", error);
+          setLoadingGoogleAuth(false);
+          alert(error.details);
+        });
+    } catch (error) {
+      console.error("Google Auth Error:", error);
+    }
   };
   useEffect(() => {
-    if (GoogleAuth) {
-      console.log("Signed in?", GoogleAuth.isSignedIn.get());
-      setSignedIn(GoogleAuth.isSignedIn.get());
-      setUserData(GoogleAuth.currentUser.get().getBasicProfile());
-      setLoadingGoogleAuth(false);
+    try {
+      if (GoogleAuth) {
+        console.log("Signed in?", GoogleAuth.isSignedIn.get());
+        setSignedIn(GoogleAuth.isSignedIn.get());
+        setUserData(GoogleAuth.currentUser.get().getBasicProfile());
+        setLoadingGoogleAuth(false);
+      }
+    } catch (error) {
+      console.error("Initialization error", error);
     }
   }, [GoogleAuth]);
 
@@ -151,10 +162,7 @@ function App() {
             window.gapi.client.youtube.subscriptions
               .insert(requestBody)
               .then((response) => {
-                console.log(
-                  "Response",
-                  response.status,  
-                );
+                console.log("Response", response.status);
               })
               .catch((response) => JSON.parse(response.body))
               .then((res) => setResponseErrorMessage(res.error.message));
