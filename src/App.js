@@ -14,11 +14,12 @@ import {
   FormLabel,
   Alert,
   AlertIcon,
+  InputGroup,
+  InputLeftAddon,
+  Divider,
 } from "@chakra-ui/core";
 import { xml2subs } from "./methods/xml2subs";
 
-const googleClientID =
-  "364375717000-m3dkm19ddi6blamm1bne7o0un0s54c3t.apps.googleusercontent.com";
 const googleApiKey = "AIzaSyCNsY71HB1tD-UegkZ-Q6dE1pkmPwVikF4";
 
 function App() {
@@ -28,6 +29,12 @@ function App() {
   const [loadingGoogleAuth, setLoadingGoogleAuth] = useState(true);
   const [responseErrorMessage, setResponseErrorMessage] = useState(null);
 
+  const [googleClientID, setGoogleClientID] = useState(
+    "364375717000-m3dkm19ddi6blamm1bne7o0un0s54c3t.apps.googleusercontent.com"
+  );
+  const [googleApiKey, setGoogleApiKey] = useState(
+    "AIzaSyCNsY71HB1tD-UegkZ-Q6dE1pkmPwVikF4"
+  );
   /**
    *  XML File Handling
    *
@@ -194,7 +201,7 @@ function App() {
         <Box w="100%" textAlign="center">
           <Heading>Youtube Subscription Importer</Heading>
           <Heading as="h4" size="sm" mt="2">
-            Original from{" "}
+            This Web-App is based on a project by {" "}
             <Link
               isExternal
               color="red.400"
@@ -247,7 +254,60 @@ function App() {
           </Box>
           <Box my="20px">
             <Heading as="h3" size="md">
-              3. Authorize Youtube
+              3. (optional) Use your own API-Keys
+            </Heading>
+            <Text mt="2">
+              Youtubes API Quotas are quite small, so feel free to create your
+              own{" "}
+              <Link
+                href="https://console.cloud.google.com/"
+                isExternal
+                color="red.400"
+              >
+                Google Cloud Project
+                <Icon name="external-link" mx="2px" />
+              </Link>
+              , enable the
+              <Link
+                href="https://console.cloud.google.com/apis/api/youtube.googleapis.com/overview"
+                isExternal
+                color="red.400"
+              >
+                Youtube API
+              </Link>
+              , as well as{" "}
+              <Link
+                href="https://console.cloud.google.com/apis/credentials"
+                isExternal
+                color="red.400"
+              >
+                Auth 2.0 Credentials
+              </Link>{" "}
+              and paste the Keys in the Form below:
+            </Text>
+            <InputGroup my="20px">
+              <InputLeftAddon children="Google-Client-ID" />
+              <Input
+                roundedLeft="0"
+                placeholder={googleClientID}
+                onChange={(event) => setGoogleClientID(event.target.value)}
+              />
+            </InputGroup>
+            <InputGroup my="20px">
+              <InputLeftAddon children="Google API Key" />
+              <Input
+                roundedLeft="0"
+                placeholder={googleApiKey}
+                onChange={(event) => setGoogleApiKey(event.target.value)}
+              />
+            </InputGroup>
+            <Text>
+              (some had concerns about displaying these api keys openly, but they are bound to this domain)
+            </Text>
+          </Box>
+          <Box my="20px">
+            <Heading as="h3" size="md">
+              4. Authorize Youtube
             </Heading>
             <Text mt="2">
               Here is the sketchiest part: To subscribe to Youtube Channels,
@@ -290,7 +350,7 @@ function App() {
           </Box>
           <Box my="20px">
             <Heading as="h3" size="md">
-              4. Subscripte via API
+              5. Subscripte via API
             </Heading>
             <Button
               my="4"
@@ -318,16 +378,17 @@ function App() {
               </Alert>
             )}
           </Box>
-          <Box>
+          <Divider />
+          <Box textAlign="center">
             <Text>
-              you can find more Information about this project{" "}
+              You can find more information about this
               <Link
                 color="red.400"
                 isExternal
                 href="https://github.com/AnsgarH1/Youtube-Subscription-Importer"
               >
-                here <Icon name="external-link" mx="2px" />
-              </Link>
+                project on Github <Icon name="external-link" mx="2px" />
+              </Link>. I currently don't have the time to maintain this project, feel free fork the repository and host it yourself.
             </Text>
           </Box>
         </Box>
