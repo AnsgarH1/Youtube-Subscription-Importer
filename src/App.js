@@ -20,8 +20,6 @@ import {
 } from "@chakra-ui/core";
 import { xml2subs } from "./methods/xml2subs";
 
-const googleApiKey = "AIzaSyCNsY71HB1tD-UegkZ-Q6dE1pkmPwVikF4";
-
 function App() {
   //variables for more User-Friendly UI
   const [signedIn, setSignedIn] = useState(false);
