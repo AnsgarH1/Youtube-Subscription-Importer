@@ -193,6 +193,20 @@ function App() {
         {/** Header --------------- */}
         <Box w="100%" textAlign="center">
           <Heading>Youtube Subscription Importer</Heading>
+          <Heading as="h3" size="sm" mt="2">
+            Made with{" "}
+            <span role="img" aria-label="Coffee Emoji">
+              ☕
+            </span>{" "}
+            and{" "}
+            <span role="img" aria-label="Heart Emoji">
+              ❤️
+            </span>{" "}
+            by{" "}
+            <Link isExternal href="https://github.com/AnsgarH1" color="red.400">
+              Ansgar Hoyer <Icon name="external-link" mx="2px" />
+            </Link>
+          </Heading>{" "}
           <Heading as="h4" size="sm" mt="2">
             Original from{" "}
             <Link
@@ -208,6 +222,23 @@ function App() {
 
         {/** Content */}
         <Box flex="1" my="20px">
+          <Alert status="error" my="2">
+            <AlertIcon />
+            <Text>
+              Googles Sign-In Account quota is currently exceeded. If you
+              haven't authorized this Web-App in the past, you can't use it. I
+              currently don't have the time to further maintain this project,
+              but feel free to fork the{" "}
+              <Link
+                color="red.400"
+                isExternal
+                href="https://github.com/AnsgarH1/Youtube-Subscription-Importer"
+              >
+                Github Repository
+              </Link>{" "}
+              and host it on your own.
+            </Text>
+          </Alert>
           <Box>
             <Heading as="h3" size="md">
               1. Export Subscriptions from Youtube
@@ -317,18 +348,6 @@ function App() {
                 amount of requests per day.
               </Alert>
             )}
-          </Box>
-          <Box>
-            <Text>
-              you can find more Information about this project{" "}
-              <Link
-                color="red.400"
-                isExternal
-                href="https://github.com/AnsgarH1/Youtube-Subscription-Importer"
-              >
-                here <Icon name="external-link" mx="2px" />
-              </Link>
-            </Text>
           </Box>
         </Box>
       </Box>
